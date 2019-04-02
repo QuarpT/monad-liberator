@@ -3,8 +3,11 @@ package monadp
 import scala.concurrent.Future
 import cats._
 import cats.implicits._
+import shapeless.Lazy
 
+import scala.collection.immutable
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.language.higherKinds
 import scala.reflect.ClassTag
 
 sealed trait HList
@@ -19,9 +22,11 @@ case object HNil extends HNil
 
 trait Precedence[+A <: HList]
 
+trait PrecedenceEvidence[A <: Precedence[B], B <: HList]
+
 trait PrecedenceGreaterThan[+A, +B]
 
-trait HListGreaterThan[+A, +B]
+trait HListGreaterThan[A, B]
 
 object PrecedenceGreaterThan {
   def apply[A, B](implicit evidence: PrecedenceGreaterThan[A, B]): PrecedenceGreaterThan[A, B] = evidence
@@ -74,13 +79,14 @@ trait HighPriorityImplicits extends LowPriorityImplicits {
     }
   }
 
-  implicit def precedenceTail[A, B <: HList](implicit precedence: Precedence[A :: B]) = new Precedence[B] {}
+  implicit def precedenceTail[A, B, C](implicit precedence: Precedence[A :: B :: C :: HNil]) = new Precedence[B :: C :: HNil] {}
+  implicit def precedenceTail2[A, B, C](implicit precedence: Precedence[A :: B :: C :: HNil]) = new Precedence[C :: HNil] {}
 
   implicit def hListBaseGtEvidence[A, B <: HList]: HListGreaterThan[A :: B, HNil] = {
     new HListGreaterThan[A :: B, HNil] {}
   }
 
-  implicit def gtEvidence[A, B <: HList : ClassTag, C, D <: HList: ClassTag](implicit
+  implicit def gtEvidence[A, B <: HList, C, D <: HList](implicit
     precedenceEvidence: Precedence[A :: B],
     precedenceEvidence2: Precedence[C :: D],
     gtEvidence2: HListGreaterThan[B, D],
@@ -95,14 +101,14 @@ object Main extends App with HighPriorityImplicits {
 import scala.reflect.runtime.universe.reify
 import scala.reflect.runtime.universe._
   def other = {
-    implicit val precedence = new Precedence[Future[_] :: Option[_] :: HNil] {}
-    val x: Future[Future[Future[Int]]] = Future.successful(Future.successful(Future.successful(5)))
-    val aa: Future[Future[Option[Option[Option[Int]]]]] = Future.successful(Future.successful(Option(Option(Option(5)))))
-    val y: Future[Int] = MonadP(x)
-    val y2: Future[Option[Int]] =  MonadP(aa)
+    implicit val precedence = new Precedence[Future[_] :: List[_] :: Option[_] :: HNil] {}
+    val a: Future[Future[Future[List[List[List[Option[Option[Option[Int]]]]]]]]] = Future.successful(Future.successful(Future.successful(List(List(List(Option(Option(Option(5)))))))))
+    val z: Future[List[Option[Int]]] = MonadP(a)
   }
 
-  implicit val precedence = new Precedence[Future[_] :: Option[_] :: HNil] {}
-  val x = PrecedenceGreaterThan[Future[_], Option[_]]
-//  val y = PrecedenceGreaterThan[Option[_], Future[_]]
+  implicit val precedence = new Precedence[Future[_] :: Set[_] :: Option[_] :: HNil] {}
+  PrecedenceGreaterThan[Future[_], Set[_]]
+  PrecedenceGreaterThan[Future[_], Option[_]]
+//  val y: PrecedenceGreaterThan[Future[_], Option[_]] = PrecedenceGreaterThan[Future[_], Option[_]]
+//  val y = PrecedenceGreaterThan[Future[_], Option[_]]
 }
