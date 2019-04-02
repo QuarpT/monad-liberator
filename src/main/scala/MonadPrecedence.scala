@@ -52,28 +52,24 @@ trait LowPriorityImplicits {
   }
 }
 
-trait HighPriorityImplicits extends LowPriorityImplicits {
-  //implicit def optionFuturePrecedence[A, B, C](implicit mpInner: MonadP[Option[A], B],
-  //                                             mpOuter: MonadP[Future[B], C]) = new MonadP[Option[Future[A]], C] {
-  //
-  //  import scala.concurrent.ExecutionContext.Implicits.global
-  //
-  //  override def apply(a: Option[Future[A]]): C = {
-  //    mpOuter(a
-  //      .map(_.map(Some.apply))
-  //      .getOrElse(Future.successful(None))
-  //      .map(mpInner(_)))
-  //  }
-  //}
+trait MediumPriorityImplicits extends LowPriorityImplicits {
 
-  //  implicit def traversePrecedence[F[_]: Monad, G[_]: Monad, A, B](implicit precedenceEvidence: PrecedenceEvidence[F[_], B]) = new MonadP[F[G[A]], ] {
-  //
-  //  }
+  implicit def swapPrecedence[F[_] : Monad : Traverse, G[_] : Monad, A, B, C](implicit
+    ev: PrecedenceGreaterThan[G[_], F[_]],
+    mpInner: MonadP[F[A], B],
+    mpOuter: MonadP[G[B], C]): MonadP[F[G[A]], C] =
+    new MonadP[F[G[A]], C] {
+      override def apply(a: F[G[A]]): C = {
+        mpOuter(Traverse[F].sequence(a).map(mpInner.apply))
+      }
+    }
+}
 
+trait HighPriorityImplicits extends MediumPriorityImplicits {
   implicit def flattenPrecedence[F[_] : Monad, A, B <: HList, C, D](implicit
     precedenceEvidence: Precedence[F[_] :: B],
     mpInner: MonadP[A, C],
-    mpOuter: MonadP[F[C], D]) = new MonadP[F[F[A]], D] {
+    mpOuter: MonadP[F[C], D]): MonadP[F[F[A]], D] = new MonadP[F[F[A]], D] {
     override def apply(a: F[F[A]]): D = {
       mpOuter(Monad[F].flatten(a).map(mpInner.apply))
     }
@@ -93,7 +89,6 @@ trait HighPriorityImplicits extends LowPriorityImplicits {
   ): PrecedenceGreaterThan[A, C] = {
     new PrecedenceGreaterThan[A, C] {}
   }
-
 }
 
 
@@ -102,7 +97,7 @@ import scala.reflect.runtime.universe.reify
 import scala.reflect.runtime.universe._
   def other = {
     implicit val precedence = new Precedence[Future[_] :: List[_] :: Option[_] :: HNil] {}
-    val a: Future[Future[Future[List[List[List[Option[Option[Option[Int]]]]]]]]] = Future.successful(Future.successful(Future.successful(List(List(List(Option(Option(Option(5)))))))))
+    val a: Option[Future[Option[Future[List[List[Future[Int]]]]]]] = Option(Future(Option(Future(List(List(Future(5)))))))
     val z: Future[List[Option[Int]]] = MonadP(a)
   }
 
