@@ -11,3 +11,5 @@ libraryDependencies += "org.typelevel" %% "cats-core" % "1.6.0"
 libraryDependencies ++= Seq(
   "com.chuusai" %% "shapeless" % "2.3.3"
 )
+resolvers += Resolver.sonatypeRepo("releases")
+addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.9")

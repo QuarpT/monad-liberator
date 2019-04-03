@@ -1,10 +1,9 @@
 package monadp
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 import cats._
 import cats.implicits._
-import shapeless.Lazy
-
+import scala.concurrent.duration._
 import scala.collection.immutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.higherKinds
@@ -22,14 +21,29 @@ case object HNil extends HNil
 
 trait Precedence[+A <: HList]
 
-trait PrecedenceEvidence[A <: Precedence[B], B <: HList]
-
-trait PrecedenceGreaterThan[+A, +B]
+trait PrecedenceGreaterThan[A, B]
 
 trait HListGreaterThan[A, B]
 
-object PrecedenceGreaterThan {
-  def apply[A, B](implicit evidence: PrecedenceGreaterThan[A, B]): PrecedenceGreaterThan[A, B] = evidence
+//trait Unused[A]
+
+case class Unused[A](a: A)
+
+trait MegaMapT[A[_], B] {
+  def apply[C](a: A[B])(f: B => C): A[C]
+}
+
+trait MegaMap1[F[_], B] extends MegaMapT[F, B]
+
+object MegaMap1 {
+  def apply[F[_], G[_], B, C](a: F[G[B]])(f: B => C)(implicit mm: MegaMap1[Lambda[X => F[G[X]]], B]) = mm(a)(f)
+}
+
+//trait MegaMap2[F[_], G[_], B] extends MegaMapT[F[_ <: G], B]
+
+
+object MegaMapT {
+  def apply[A[_], B, C](a: A[B])(f: B => C)(implicit mm: MegaMapT[A,B]): A[C] = mm(a)(f)
 }
 
 trait MonadP[A, B] {
@@ -50,6 +64,11 @@ trait LowPriorityImplicits {
   implicit def hListGtEvidence[A, B <: HList, C, D <: HList](implicit ev1: HListGreaterThan[B, D]): HListGreaterThan[A :: B, C :: D] = {
     new HListGreaterThan[A :: B, C :: D] {}
   }
+
+//  implicit def megaMapBase[F[_] : Functor, A] = new MegaMap[F, A] {
+//    override def apply[B](functor: F[A])(f: A => B): F[B] = Functor[F].map(functor)(f)
+//  }
+
 }
 
 trait MediumPriorityImplicits extends LowPriorityImplicits {
@@ -66,6 +85,17 @@ trait MediumPriorityImplicits extends LowPriorityImplicits {
 }
 
 trait HighPriorityImplicits extends MediumPriorityImplicits {
+
+//  implicit def megaMapRule[F[_] : Functor, B] = new MegaMap1[F, B]  {
+//    override def apply[C](a: F[B])(f: B => C): F[C] = Functor[F].map(a)(f)
+//  }
+
+  implicit def megaMapRule1[F[_] : Functor, G[_] : Functor, B] = new MegaMap1[Lambda[X => F[G[X]]], B]  {
+    override def apply[C](a: F[G[B]])(f: B => C): F[G[C]] = {
+      Functor[F].map(a)(_.map(f))
+    }
+  }
+
   implicit def flattenPrecedence[F[_] : Monad, A, B <: HList, C, D](implicit
     precedenceEvidence: Precedence[F[_] :: B],
     mpInner: MonadP[A, C],
@@ -95,15 +125,17 @@ trait HighPriorityImplicits extends MediumPriorityImplicits {
 object Main extends App with HighPriorityImplicits {
 import scala.reflect.runtime.universe.reify
 import scala.reflect.runtime.universe._
-  def other = {
     implicit val precedence = new Precedence[Future[_] :: List[_] :: Option[_] :: HNil] {}
     val a: Option[Future[Option[Future[List[List[Future[Int]]]]]]] = Option(Future(Option(Future(List(List(Future(5)))))))
     val z: Future[List[Option[Int]]] = MonadP(a)
-  }
 
-  implicit val precedence = new Precedence[Future[_] :: Set[_] :: Option[_] :: HNil] {}
-  PrecedenceGreaterThan[Future[_], Set[_]]
-  PrecedenceGreaterThan[Future[_], Option[_]]
-//  val y: PrecedenceGreaterThan[Future[_], Option[_]] = PrecedenceGreaterThan[Future[_], Option[_]]
-//  val y = PrecedenceGreaterThan[Future[_], Option[_]]
+//  val x = MegaMapT(List(List(5)))(s => s)
+
+//  type LL[E] = List[List[E]]
+//  implicit val  zzz: List[List[Int]] = implicitly[MegaMap1[LL, Int]].apply(List(List(5)))(x => x)
+  println(MegaMap1(List(List(5)))(x=>x))
+//    megaMapSplitterRule[Int]
+
+//    val x = implicitly[MegaMap[Unused, List, Int]].apply()()
+//    println(Await.result(z, 5 seconds))
 }
