@@ -217,12 +217,13 @@ object Main extends App with HighPriorityImplicits {
 
   val either = Right(2): Either[String, Int]
   val e = Right(2) :Either[String, Int]
-  DeepMap1[Lambda[X => Either[String, X]], Int](e)(deepMapRule1[Lambda[X => Either[String, X]], Int])
+  implicit def twoTypeRule[F[_,_], A](implicit f: Functor[Lambda[X =>F[A, X]]]): DeepMap[F[A, ?], Int] = deepMapRule1[Lambda[X => F[A, X]], Int]
+  DeepMap1[Lambda[X => Either[String, X]], Int](e)
 
-//  val result = for {
-//    a <- (Right(2) :Either[String, Int]).mp1
-//    b <- List(5).mp1
-//  } yield a * b
+  val result = for {
+    a <- (Right(2) :Either[String, Int]).mp1
+    b <- List(5).mp1
+  } yield a * b
 
 //  println(Await.result(result, 5 seconds))
   // Outputs List(Some(5), Some(10), Some(15), Some(20))
