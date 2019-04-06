@@ -9,17 +9,17 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.higherKinds
 import scala.reflect.ClassTag
 
-sealed trait HList
+sealed trait PrecedenceList
 
-final case class ::[+H, +T <: HList](head: H, tail: T) extends HList
+final case class :>:[+H, +T <: PrecedenceList](head: H, tail: T) extends PrecedenceList
 
-sealed trait HNil extends HList {
-  def ::[H](h: H) = monadp.::(h, this)
+sealed trait HNil extends PrecedenceList {
+  def ::[H](h: H) = monadp.:>:(h, this)
 }
 
 case object HNil extends HNil
 
-trait Precedence[+A <: HList]
+trait Precedence[+A <: PrecedenceList]
 
 //object Precedence {
 //  def apply[A](implicit p: Precedence[A]) = p
@@ -78,8 +78,8 @@ trait LowPriorityImplicits {
     override def apply(a: A): A = a
   }
 
-  implicit def hListGtEvidence[A, B <: HList, C, D <: HList](implicit ev1: HListGreaterThan[B, D]): HListGreaterThan[A :: B, C :: D] = {
-    new HListGreaterThan[A :: B, C :: D] {}
+  implicit def hListGtEvidence[A, B <: PrecedenceList, C, D <: PrecedenceList](implicit ev1: HListGreaterThan[B, D]): HListGreaterThan[A :>: B, C :>: D] = {
+    new HListGreaterThan[A :>: B, C :>: D] {}
   }
 
 }
@@ -133,8 +133,8 @@ trait HighPriorityImplicits extends MediumPriorityImplicits {
     }
   }
 
-  implicit def flattenPrecedence[F[_] : Monad, A, B <: HList, C, D](implicit
-    precedenceEvidence: Precedence[F[_] :: B],
+  implicit def flattenPrecedence[F[_] : Monad, A, B <: PrecedenceList, C, D](implicit
+    precedenceEvidence: Precedence[F[_] :>: B],
     mpInner: MonadP[A, C],
     mpOuter: MonadP[F[C], D]): MonadP[F[F[A]], D] = new MonadP[F[F[A]], D] {
     override def apply(a: F[F[A]]): D = {
@@ -142,17 +142,17 @@ trait HighPriorityImplicits extends MediumPriorityImplicits {
     }
   }
 
-  implicit def precedenceTail[A, B, C](implicit precedence: Precedence[A :: B :: C :: HNil]) = new Precedence[B :: C :: HNil] {}
+  implicit def precedenceTail[A, B, C](implicit precedence: Precedence[A :>: B :>: C :>: HNil]) = new Precedence[B :>: C :>: HNil] {}
 
-  implicit def precedenceTail2[A, B, C](implicit precedence: Precedence[A :: B :: C :: HNil]) = new Precedence[C :: HNil] {}
+  implicit def precedenceTail2[A, B, C](implicit precedence: Precedence[A :>: B :>: C :>: HNil]) = new Precedence[C :>: HNil] {}
 
-  implicit def hListBaseGtEvidence[A, B <: HList]: HListGreaterThan[A :: B, HNil] = {
-    new HListGreaterThan[A :: B, HNil] {}
+  implicit def hListBaseGtEvidence[A, B <: PrecedenceList]: HListGreaterThan[A :>: B, HNil] = {
+    new HListGreaterThan[A :>: B, HNil] {}
   }
 
-  implicit def gtEvidence[A, B <: HList, C, D <: HList](implicit
-    precedenceEvidence: Precedence[A :: B],
-    precedenceEvidence2: Precedence[C :: D],
+  implicit def gtEvidence[A, B <: PrecedenceList, C, D <: PrecedenceList](implicit
+    precedenceEvidence: Precedence[A :>: B],
+    precedenceEvidence2: Precedence[C :>: D],
     gtEvidence2: HListGreaterThan[B, D],
   ): PrecedenceGreaterThan[A, C] = {
     new PrecedenceGreaterThan[A, C] {}
@@ -186,7 +186,7 @@ object Main extends App with PrecedenceWithEither[String]{
 
 
 
-  implicit val precedence = new Precedence[List[_] :: Either[_] ::  Option[_] :: HNil] {}
+  implicit val precedence = new Precedence[List[_] :>: Either[_] :>:  Option[_] :>: HNil] {}
 
   val x = Right(Right(5)) :Either[Either[Int]]
 
