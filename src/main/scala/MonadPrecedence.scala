@@ -157,31 +157,15 @@ trait HighPriorityImplicits extends MediumPriorityImplicits {
   ): PrecedenceGreaterThan[A, C] = {
     new PrecedenceGreaterThan[A, C] {}
   }
-
-//  implicit def eitherMonad[L] = new Monad[Lambda[X => Either[L, X]]] {
-//    override def pure[A](x: A): Either[L, A] = Right(x)
-//    override def flatMap[A, B](fa: Either[L, A])(f: A => Either[L, B]): Either[L, B] = fa.flatMap(f)
-//    override def tailRecM[A, B](a: A)(f: A => Either[L, Either[A, B]]): Either[L, B] =  f(a) match {
-//      case Left(a) => Left(a)
-//      case Right(Left(nextA)) => tailRecM(nextA)(f)
-//      case Right(Right(b)) => Right(b)
-//    }
-//  }
-
-   def eitherTraversable[L] = new Traverse[Lambda[X => Either[L, X]]] {
-    override def traverse[G[_], A, B](fa: Either[L, A])(f: A => G[B])(implicit evidence$1: Applicative[G]): G[Either[L, B]] = {
-//      fa.tr
-      ???
-    }
-
-    override def foldLeft[A, B](fa: Either[L, A], b: B)(f: (B, A) => B): B = ???
-
-    override def foldRight[A, B](fa: Either[L, A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] = ???
-  }
 }
 
+trait PrecedenceWithEither[LeftType] extends HighPriorityImplicits {
+  type Either[R] = scala.Either[LeftType, R]
+  def Right[A](value: A): Either[A] = scala.Right(value)
+  def Left(value: LeftType): Either[LeftType] = scala.Left(value)
+}
 
-object Main extends App with HighPriorityImplicits {
+object Main extends App with PrecedenceWithEither[String]{
  import DeepMap._
   import scala.reflect.runtime.universe.reify
   import scala.reflect.runtime.universe._
@@ -193,37 +177,44 @@ object Main extends App with HighPriorityImplicits {
 ////  println(DeepMap(List(Option(5)))(x => x * 2))
 //  val aa: Seq[Option[String]] = DeepMap.apply(List(Option(5)))(x => x.toString)
 
-//  val e: Either[Nothing, List[Option[Int]]] = Right(List(Option(5)))
-//  val bb: Either[Nothing, List[Option[String]]] = DeepMap.apply2(e)(_.toString)
-//  Functor[Either[String, _]]
+//  val e: Either[List[Option[Int]]] = Right(List(Option(5)))
+//  val bb: Either[List[Option[String]]] = DeepMap.apply2(e)(_.toString)
+//  Functor[Either[_]]
 
 
   Option(Future(5)).map(x => Future.successful(Some(x))).getOrElse(Future.successful(None))
 
 
 
-  implicit val precedence = new Precedence[List[_] :: Either[_, _] ::  Option[_] :: HNil] {}
+  implicit val precedence = new Precedence[List[_] :: Either[_] ::  Option[_] :: HNil] {}
 
-  val x = Right(Right(5)) :Either[String, Either[String, Int]]
+  val x = Right(Right(5)) :Either[Either[Int]]
 
 //  implicit val eitherS = eitherTraversable[String]
 
-  Traverse[Lambda[X =>Either[String, X]]]
-  Monad[Lambda[X =>Either[String, X]]]
-  Functor[Lambda[X =>Either[String, X]]]
+  Traverse[Lambda[X =>Either[X]]]
+  Monad[Lambda[X =>Either[X]]]
+  Functor[Either[?]]
 
-//  implicitly[Precedence[Either[String, _]]]
-  implicitly[Precedence[List[_] :: Either[_, _] ::  Option[_] :: HNil] ]
+//  implicitly[Precedence[Either[_]]]
 
-  val either = Right(2): Either[String, Int]
-  val e = Right(2) :Either[String, Int]
-  implicit def twoTypeRule[F[_,_], A](implicit f: Functor[Lambda[X =>F[A, X]]]): DeepMap[F[A, ?], Int] = deepMapRule1[Lambda[X => F[A, X]], Int]
-  DeepMap1[Lambda[X => Either[String, X]], Int](e)
+  val either = Right(2): Either[Int]
+
+  val e = Right(2) :Either[Int]
+
+//  implicit def twoTypeRule[F[_,_], A, B](implicit f: Functor[Lambda[X =>F[A, X]]]): DeepMap[F[A, ?], B] = deepMapRule1[Lambda[X => F[A, X]], B]
+//  implicit def twoTypeRule[Either, A]: DeepMap[Either[?], Int] = deepMapRule1[Either[?], Int]
+//  DeepMap1[Lambda[X => Either[X]], Int](e)
 
   val result = for {
-    a <- (Right(2) :Either[String, Int]).mp1
-    b <- List(5).mp1
-  } yield a * b
+    a <- Right(1).mp
+    b <- List(5, 2).mp
+    c <- Option(2).mp
+    d <- Left("ah").mp
+//    b <- List(5).mp1
+  } yield a * b * c
+
+  println(result)
 
 //  println(Await.result(result, 5 seconds))
   // Outputs List(Some(5), Some(10), Some(15), Some(20))
