@@ -1,6 +1,6 @@
-name := "monad-precedence"
+name := "monad-liberator"
 
-version := "0.1"
+version := "0.1.0"
 
 scalaVersion := "2.12.8"
 resolvers ++= Seq(
@@ -8,8 +8,6 @@ resolvers ++= Seq(
   Resolver.sonatypeRepo("snapshots")
 )
 libraryDependencies += "org.typelevel" %% "cats-core" % "1.6.0"
-libraryDependencies ++= Seq(
-  "com.chuusai" %% "shapeless" % "2.3.3"
-)
-resolvers += Resolver.sonatypeRepo("releases")
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
+
 addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.9")

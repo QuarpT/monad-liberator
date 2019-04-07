@@ -17,9 +17,7 @@ object BasicExample extends MonadLiberator[String] {
     c <- Future(1).!?
   } yield a * b + c
 
-  // Returns List(None, Some(3), None, Some(5))
-  println(Await.result(result, Duration.Inf))
-
+  // Returns Future(List(None, Some(3), None, Some(5)))
 }
 
 // Intellij prefers specifying the monad depth
@@ -31,8 +29,7 @@ object ExampleExplicitlyIndicatingMonadDepth extends MonadLiberator[String] {
     c <- Future(1).dm1
   } yield a * b + c
 
-  // Returns List(None, Some(3), None, Some(5))
-  println(Await.result(result, Duration.Inf))
+  // Returns Future(List(None, Some(3), None, Some(5)))
 
 }
 
@@ -42,12 +39,11 @@ object ComplexExample extends MonadLiberator[String] {
   val result: Future[List[Either[Option[Int]]]] = for {
     a <- Option(Future(Right(List(1, 2)))).dm4
     b <- Option(Option(2)).dm2
-    c <- (a + b).dm0 // Currently the library does not suppert _ = _ in for comprehension. Instread use `.dm0` (a 0 nested Monad)
+    c <- (a + b).dm0 // Currently the library does not support _ = _ in for comprehension. Instread use `.dm0` (a 0 nested Monad)
     d <- (if (c % 2 == 0) Right(c) else Left[Int](s"$c is not even")).dm1 // Using custom Right and Left type aliases. Left must specify the right type
   } yield d
 
-  // Returns List(Left(Not even), Right(Some(4)))
-  println(Await.result(result, Duration.Inf))
+  // Returns Future(List(Left("3 is not even"), Right(Some(4))))
 
 }
 
@@ -73,7 +69,6 @@ object ExampleChangingPrecedence {
     c <- Future(1).!?
   } yield a * b + c
 
-  // Returns None since we have overridden the nesting order so that Options come before lists
-  println(Await.result(result, Duration.Inf))
+  // Returns Future(None) since we have overridden the nesting order so that Options come before lists
 }
 
