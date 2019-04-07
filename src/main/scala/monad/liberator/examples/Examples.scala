@@ -3,11 +3,11 @@ package monad.liberator.examples
 import monad.liberator._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Await, Future}
-import scala.concurrent.duration.Duration
+import scala.concurrent.Future
 import scala.util.Try
 
 // The default precedence is Future[_] :>>: List[_] :>>: Either[_] :>>: Try[_] :>>:  Option[_]
+// All monads must be defined as part of the implicit monad precedence order. It is possible to provide your own monad precedence
 
 object BasicExample extends MonadLiberator[String] {
 
