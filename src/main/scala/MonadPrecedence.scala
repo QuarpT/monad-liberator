@@ -11,10 +11,10 @@ import scala.reflect.ClassTag
 
 sealed trait PList
 
-final case class :>:[+H, +T <: PList](head: H, tail: T) extends PList
+final case class :>>:[+H, +T <: PList](head: H, tail: T) extends PList
 
 sealed trait PNil extends PList {
-  def ::[H](h: H) = monadp.:>:(h, this)
+  def ::[H](h: H) = monadp.:>>:(h, this)
 }
 
 case object PNil extends PNil
@@ -78,8 +78,8 @@ trait LowPriorityImplicits {
     override def apply(a: A): A = a
   }
 
-  implicit def hListGtEvidence[A, B <: PList, C, D <: PList](implicit ev1: PlistGreaterThan[B, D]): PlistGreaterThan[A :>: B, C :>: D] = {
-    new PlistGreaterThan[A :>: B, C :>: D] {}
+  implicit def hListGtEvidence[A, B <: PList, C, D <: PList](implicit ev1: PlistGreaterThan[B, D]): PlistGreaterThan[A :>>: B, C :>>: D] = {
+    new PlistGreaterThan[A :>>: B, C :>>: D] {}
   }
 
 }
@@ -100,7 +100,7 @@ trait MediumPriorityImplicits extends LowPriorityImplicits {
 
 }
 
-trait EitherMonad {
+trait EitherEitherMonad {
   class EitherMonad[L] extends Monad[Lambda[X => Either[L, X]]] {
     override def pure[A](x: A): Either[L, A] = Right(x)
 
@@ -134,7 +134,7 @@ trait HighPriorityImplicits extends MediumPriorityImplicits {
   }
 
   implicit def flattenPrecedence[F[_] : Monad, A, B <: PList, C, D](implicit
-    precedenceEvidence: Precedence[F[_] :>: B],
+    precedenceEvidence: Precedence[F[_] :>>: B],
     mpInner: MonadP[A, C],
     mpOuter: MonadP[F[C], D]): MonadP[F[F[A]], D] = new MonadP[F[F[A]], D] {
     override def apply(a: F[F[A]]): D = {
@@ -142,17 +142,17 @@ trait HighPriorityImplicits extends MediumPriorityImplicits {
     }
   }
 
-  implicit def precedenceTail[A, B, C](implicit precedence: Precedence[A :>: B :>: C :>: PNil]) = new Precedence[B :>: C :>: PNil] {}
+  implicit def precedenceTail[A, B, C](implicit precedence: Precedence[A :>>: B :>>: C :>>: PNil]) = new Precedence[B :>>: C :>>: PNil] {}
 
-  implicit def precedenceTail2[A, B, C](implicit precedence: Precedence[A :>: B :>: C :>: PNil]) = new Precedence[C :>: PNil] {}
+  implicit def precedenceTail2[A, B, C](implicit precedence: Precedence[A :>>: B :>>: C :>>: PNil]) = new Precedence[C :>>: PNil] {}
 
-  implicit def hListBaseGtEvidence[A, B <: PList]: PlistGreaterThan[A :>: B, PNil] = {
-    new PlistGreaterThan[A :>: B, PNil] {}
+  implicit def hListBaseGtEvidence[A, B <: PList]: PlistGreaterThan[A :>>: B, PNil] = {
+    new PlistGreaterThan[A :>>: B, PNil] {}
   }
 
   implicit def gtEvidence[A, B <: PList, C, D <: PList](implicit
-    precedenceEvidence: Precedence[A :>: B],
-    precedenceEvidence2: Precedence[C :>: D],
+    precedenceEvidence: Precedence[A :>>: B],
+    precedenceEvidence2: Precedence[C :>>: D],
     gtEvidence2: PlistGreaterThan[B, D],
   ): PrecedenceGreaterThan[A, C] = {
     new PrecedenceGreaterThan[A, C] {}
@@ -186,7 +186,7 @@ object Main extends App with PrecedenceWithEither[String]{
 
 
 
-  implicit val precedence = new Precedence[List[_] :>: Either[_] :>:  Option[_] :>: PNil] {}
+  implicit val precedence = new Precedence[Future[_] :>>: List[_]  :>>:  Option[_] :>>: PNil] {}
 
   val x = Right(Right(5)) :Either[Either[Int]]
 
@@ -206,15 +206,27 @@ object Main extends App with PrecedenceWithEither[String]{
 //  implicit def twoTypeRule[Either, A]: DeepMap[Either[?], Int] = deepMapRule1[Either[?], Int]
 //  DeepMap1[Lambda[X => Either[X]], Int](e)
 
+//  val result = for {
+//    a <- Right(1).mp
+//    b <- List(5, 2).mp
+//    c <- Option(2).mp
+//    d <- Left("ah").mp
+////    b <- List(5).mp1
+//  } yield a * b * c
+
+gtEvidence[Future[_], List[_]  :>>: Option[_] :>>:  PNil, List[_],  Option[_] :>>:  PNil]
   val result = for {
-    a <- Right(1).mp
-    b <- List(5, 2).mp
-    c <- Option(2).mp
-    d <- Left("ah").mp
-//    b <- List(5).mp1
+    a <- List(1, 2, 3, 4, 5).mp
+    b <- Option(5).mp
+    c <- Future(3).mp
   } yield a * b * c
 
+
+   val asdf = MonadP(List(Future(1)))
+
   println(result)
+
+//  println(result)
 
 //  println(Await.result(result, 5 seconds))
   // Outputs List(Some(5), Some(10), Some(15), Some(20))

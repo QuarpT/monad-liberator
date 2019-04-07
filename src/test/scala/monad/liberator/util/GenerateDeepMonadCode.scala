@@ -1,8 +1,5 @@
 package monad.liberator.util
 
-/**
-  *
-  */
 object GenerateDeepMonadCode extends App {
   for {
     inputTypeCount <- 1 to 8
