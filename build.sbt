@@ -10,6 +10,8 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 
 addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.9")
 
+crossScalaVersions := Seq("2.11.11", "2.12.5")
+
 // Use normal Scala 2.11/2.12 versioning after sonatype maven repo is setup
 version := {
   val versionPrefix = CrossVersion.partialVersion(scalaVersion.value) match {

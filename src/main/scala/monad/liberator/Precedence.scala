@@ -33,7 +33,7 @@ trait PrecedenceImplicits extends PrecedenceLowPriorityImplicits with Precedence
   implicit def greaterThanEvidenceRule[A, B <: PList, C, D <: PList](implicit
     precedenceEvidence: Precedence[A :>>: B],
     precedenceEvidence2: Precedence[C :>>: D],
-    pListGreaterThanEvidence: PListGreaterThan[B, D],
+    pListGreaterThanEvidence: PListGreaterThan[B, D]
   ): PrecedenceGreaterThan[A, C] = {
     new PrecedenceGreaterThan[A, C] {}
   }
