@@ -6,7 +6,7 @@ import scala.language.higherKinds
 
 /*
  *
- * See comments for writing a single implicit rule and a base case in monad.liberator.DeepMonad
+ * See comments on writing a single implicit rule and a base case in monad.liberator.DeepMonad
  *
  * Peter Colley
  *
