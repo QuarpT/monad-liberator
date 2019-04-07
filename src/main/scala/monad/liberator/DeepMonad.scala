@@ -32,7 +32,17 @@ import scala.language.higherKinds
  *
  */
 trait DeepMonadImplicits {
-    implicit class DeepMonad1[F1[_], A](functor: F1[A])(implicit dfm: DeepMap[Lambda[X => F1[X]], A]) {
+  implicit class DeepMonad0[A](value: A) {
+    def !? = this
+    def dm = this
+    def dm0 = this
+    def deepMap[B](f: A => B): B = f(value)
+    def deepFlatMap[B](f: A => B): B = deepMap(f)
+    def flatMap[B](f: A => B): B = deepMap(f)
+    def map[B](f: A => B): B = deepMap(f)
+  }
+
+  implicit class DeepMonad1[F1[_], A](functor: F1[A])(implicit dfm: DeepMap[Lambda[X => F1[X]], A]) {
     def !? = this
     def dm = this
     def dm1 = this
