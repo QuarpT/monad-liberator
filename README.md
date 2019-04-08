@@ -41,11 +41,10 @@ This precedence means for the types output, Future will always be outside Lists,
 All types must have a `Cats` Monad implementation, and all types except for the leftmost, must have a `Cats` Traverse implementation on the implicit scope.
 Mixing in the `MonadLiberator` trait provides the default `Cats` implicits.
 
-Maximum number of monad types in the precedence order is 7 to keep compile times down.
-Maximum number of nested monads when deep mapping is 7 to keep compile times down.
-
-Maximum number of nested monads when applying DeepFlattenTraverse is unlimited!
-Maximum levels in a for comprehension is unlimited!
+- Maximum number of monad types in the precedence order is 7 to keep compile times down.
+- Maximum number of nested monads when deep mapping is 7 to keep compile times down.
+- Maximum number of nested monads when applying DeepFlattenTraverse is unlimited!
+- Maximum levels in a for comprehension is unlimited!
 
 The library builds type class instances to sequence and flatten nested monads using the precedence rule defined implicitly. 
 
