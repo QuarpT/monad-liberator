@@ -7,7 +7,7 @@ import scala.util.Try
 /*
  *
  * It should be possible to refactor out the EitherLeftType,
- * and providing a solution for DeepMonadImplicits for Monad types with extra fixed type parameters
+ * and provide a solution for DeepMonadImplicits for Monad types with extra fixed type parameters
  *
  */
 

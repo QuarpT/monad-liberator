@@ -1,7 +1,8 @@
-import monad.liberator.MonadLiberator
+package monad.liberator
+
 import monad.liberator.examples._
-import org.scalatest.{FlatSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{FlatSpec, Matchers}
 
 class MonadLiberatorTest extends FlatSpec with  MonadLiberator[String] with ScalaFutures with Matchers {
 

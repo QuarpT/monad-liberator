@@ -102,23 +102,4 @@ trait DeepMonadImplicits {
     def map[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[F3[F4[F5[F6[B]]]]]], C]): C = deepFlatMap(f)
   }
 
-  implicit class DeepMonad7[F1[_], F2[_], F3[_], F4[_], F5[_], F6[_], F7[_], A](functor: F1[F2[F3[F4[F5[F6[F7[A]]]]]]])(implicit dfm: DeepMap[Lambda[X => F1[F2[F3[F4[F5[F6[F7[X]]]]]]]], A]) {
-    def !? = this
-    def dm = this
-    def dm7 = this
-    def deepMap[B](f: A => B): F1[F2[F3[F4[F5[F6[F7[B]]]]]]] = dfm(functor)(f)
-    def deepFlatMap[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[F3[F4[F5[F6[F7[B]]]]]]], C]): C = dft(dfm(functor)(f))
-    def flatMap[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[F3[F4[F5[F6[F7[B]]]]]]], C]): C = deepFlatMap(f)
-    def map[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[F3[F4[F5[F6[F7[B]]]]]]], C]): C = deepFlatMap(f)
-  }
-
-  implicit class DeepMonad8[F1[_], F2[_], F3[_], F4[_], F5[_], F6[_], F7[_], F8[_], A](functor: F1[F2[F3[F4[F5[F6[F7[F8[A]]]]]]]])(implicit dfm: DeepMap[Lambda[X => F1[F2[F3[F4[F5[F6[F7[F8[X]]]]]]]]], A]) {
-    def !? = this
-    def dm = this
-    def dm8 = this
-    def deepMap[B](f: A => B): F1[F2[F3[F4[F5[F6[F7[F8[B]]]]]]]] = dfm(functor)(f)
-    def deepFlatMap[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[F3[F4[F5[F6[F7[F8[B]]]]]]]], C]): C = dft(dfm(functor)(f))
-    def flatMap[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[F3[F4[F5[F6[F7[F8[B]]]]]]]], C]): C = deepFlatMap(f)
-    def map[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[F3[F4[F5[F6[F7[F8[B]]]]]]]], C]): C = deepFlatMap(f)
-  }
 }

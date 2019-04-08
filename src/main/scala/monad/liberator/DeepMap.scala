@@ -54,16 +54,4 @@ trait DeepMapImplicits {
     }
   }
 
-  implicit def deepMapRule7[F1[_] : Functor, F2[_] : Functor, F3[_] : Functor, F4[_] : Functor, F5[_] : Functor, F6[_] : Functor, F7[_] : Functor, B] = new DeepMap[Lambda[X => F1[F2[F3[F4[F5[F6[F7[X]]]]]]]], B] {
-    override def apply[C](a: F1[F2[F3[F4[F5[F6[F7[B]]]]]]])(f: B => C): F1[F2[F3[F4[F5[F6[F7[C]]]]]]] = {
-      Functor[F1].compose[F2].compose[F3].compose[F4].compose[F5].compose[F6].compose[F7].map(a)(f)
-    }
-  }
-
-  implicit def deepMapRule8[F1[_] : Functor, F2[_] : Functor, F3[_] : Functor, F4[_] : Functor, F5[_] : Functor, F6[_] : Functor, F7[_] : Functor, F8[_] : Functor, B] = new DeepMap[Lambda[X => F1[F2[F3[F4[F5[F6[F7[F8[X]]]]]]]]], B] {
-    override def apply[C](a: F1[F2[F3[F4[F5[F6[F7[F8[B]]]]]]]])(f: B => C): F1[F2[F3[F4[F5[F6[F7[F8[C]]]]]]]] = {
-      Functor[F1].compose[F2].compose[F3].compose[F4].compose[F5].compose[F6].compose[F7].compose[F8].map(a)(f)
-    }
-  }
-
 }
