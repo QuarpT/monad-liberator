@@ -21,6 +21,8 @@ object BasicExample extends MonadLiberator[String] {
   // Returns Future(List(None, Some(3), None, Some(5)))
   // Intellij Scala plugin doesn't think this will compile, but it does.
   // For Intellij friendly code, see ExampleExplicitlyIndicatingMonadDepth
+
+  // For Options, if flatMapping on Some or None by themselves, specify the Option type explicitly, e.g. `None: Option[Int]`
 }
 
 object DeepFlattenExample extends MonadLiberator[String] {
@@ -38,6 +40,11 @@ object ExampleExplicitlyIndicatingMonadDepth extends MonadLiberator[String] {
   } yield a * b + c
 
   // Returns Future(List(None, Some(3), None, Some(5)))
+}
+
+object DeepMapExample extends MonadLiberator[String] {
+  val result: Future[List[Either[Option[Int]]]] = Future(List(Right(Option(5)))).deepMap(_ * 2)
+  // Returns Future(List(Right(Some(10)))
 }
 
 // A more complex example

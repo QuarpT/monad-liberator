@@ -4,7 +4,7 @@ Liberate your monads
 
 ## Overview
 
-Monad Liberator is a library for mixing monads and nested monads in Scala `for` comprehensions using customisable implicit rules of precedence.
+Monad Liberator is a library for mixing multiple monad and nested monads types in Scala `for` comprehensions using customisable implicit rules of precedence.
 
 The library also supports deep flattening / deep traversing / deep mapping nested monads
 
@@ -42,9 +42,9 @@ All types must have a `Cats` Monad implementation, and all types except for the 
 Mixing in the `MonadLiberator` trait provides the default `Cats` implicits.
 
 - Maximum number of monad types in the precedence order is 7 to keep compile times down.
-- Maximum number of nested monads when deep mapping is 7 to keep compile times down.
-- Maximum number of nested monads when applying DeepFlattenTraverse is unlimited!
-- Maximum levels in a for comprehension is unlimited!
+- Maximum number of nested monad types when deep mapping is 6 to keep compile times down.
+- Maximum number of nested monad types when applying DeepFlattenTraverse is unlimited!
+- Maximum levels of flatMapping in a for comprehension is unlimited!
 
 The library builds type class instances to sequence and flatten nested monads using the precedence rule defined implicitly. 
 
