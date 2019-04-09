@@ -10,6 +10,8 @@ The library also supports deep flattening / deep traversing / deep mapping neste
 
 ## Install
 
+Requires Scala 2.12 or 2.11
+
 ```sbtshell
 resolvers += Resolver.bintrayRepo("quarpt", "maven")
 libraryDependencies += "monad-liberator" %% "monad-liberator" % "0.1.0"

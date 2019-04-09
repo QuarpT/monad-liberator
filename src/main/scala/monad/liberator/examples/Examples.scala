@@ -26,7 +26,8 @@ object BasicExample extends MonadLiberator[String] {
 }
 
 object DeepFlattenExample extends MonadLiberator[String] {
-  val result = DeepFlattenTraverse(Option(Future(Future(Right(Option(Option(List(5))))))))
+  val result: Future[List[Either[Option[Int]]]] =
+    DeepFlattenTraverse(Option(Future(Future(Right(Option(Option(List(5))))))))
   // Returns Future(List(Right(Some(5)))
 }
 
