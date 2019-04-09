@@ -14,4 +14,4 @@ addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.9")
 
 crossScalaVersions := Seq("2.11.11", "2.12.8")
 
-bintrayRepository := "monad-liberator"
+licenses += ("Apache-2.0", url("https://opensource.org/licenses/Apache-2.0"))

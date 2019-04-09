@@ -8,6 +8,13 @@ Monad Liberator is a library for mixing multiple monad and nested monads types i
 
 The library also supports deep flattening / deep traversing / deep mapping nested monads
 
+## Install
+
+```sbtshell
+resolvers += Resolver.bintrayRepo("quarpt", "maven")
+libraryDependencies += "monad-liberator" %% "monad-liberator" % "0.1.0"
+```
+
 ## Examples
 
 ### For comprehension example
