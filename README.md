@@ -52,8 +52,8 @@ Mixing in the `MonadLiberator` trait provides the default `Cats` implicits.
 
 - Maximum number of monad types in the precedence order is 7 to keep compile times down.
 - Maximum number of nested monad types when deep mapping is 6 to keep compile times down.
-- Maximum number of nested monad types when applying DeepFlattenTraverse is unlimited!
-- Maximum levels of flatMapping in a for comprehension is unlimited!
+- Maximum number of nested monad types when applying DeepFlattenTraverse is unlimited.
+- Maximum levels of flatMapping in a for comprehension is unlimited.
 
 The library builds type class instances to sequence and flatten nested monads using the precedence rule defined implicitly. 
 
