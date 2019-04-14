@@ -32,9 +32,9 @@ trait DeepFlattenTraverseMediumPriorityImplicits extends DeepFlattenTraverseLowP
 }
 
 trait DeepFlattenTraverseImplicits extends DeepFlattenTraverseMediumPriorityImplicits {
-  implicit def flattenPrecedence[F[_] : Monad, P <: PList, E, A, B <: PList, C, D](implicit
+  implicit def flattenPrecedence[F[_] : Monad, P <: PList, FF, A, B <: PList, C, D](implicit
     precedence: Precedence[P],
-    precedenceEvidence: PrecedenceEvidence[EvidenceOf[F[_]], Precedence[P], E],
+    precedenceEvidence: PrecedenceEvidence[EvidenceOf[F[_]], Precedence[P], FF],
     mpInner: DeepFlattenTraverse[A, C],
     mpOuter: DeepFlattenTraverse[F[C], D]): DeepFlattenTraverse[F[F[A]], D] = new DeepFlattenTraverse[F[F[A]], D] {
     override def apply(a: F[F[A]]): D = {
