@@ -2,104 +2,15 @@ package monad.liberator
 
 import scala.language.higherKinds
 
-/*
- *
- * I was unable to find a nice solution for deepMap. I feel I came close with:
- *
- *     trait DeepMap[A, B] {
- *       type Aux = B
- *       def apply(a: A): B
- *     }
- *
- *     implicit def deepMapBase[F[_] : Functor, A] = new DeepMap[F[A], Functor[F]] {
- *       override def apply(a: F[A]): Functor[F] = Functor[F]
- *     }
- *
- *     implicit def deepMapRule[F[_] : Functor, G[_], B, C[_]: Functor](implicit mm: DeepMap[G[B], Functor[C]]) =
- *       new DeepMap[F[G[B]], Functor[Lambda[α => F[C[α]]]]] {
- *         override def apply(a: F[G[B]]): Functor[Lambda[α => F[C[α]]]] = Functor[F].compose[C]
- *       }
- *
- * But sadly the Scala implicit heuristics didn't seem to allow generating a deep functor. I still think it might be possible.
- *
- * As a workaround I have generated this code using:
- * monad-precedence/src/test/scala/monad/liberator/util/GenerateDeepMonadCode.scala
- * monad-precedence/src/test/scala/monad/liberator/util/GenerateDeepMapCode.scala
- *
- * I would like to improve this.
- *
- * Peter Colley
- *
- */
 trait DeepMonadImplicits {
-  implicit class DeepMonad0[A](value: A) {
-    def !? = this
-    def dm = this
-    def dm0 = this
-    def deepMap[B](f: A => B): B = f(value)
-    def deepFlatMap[B](f: A => B): B = deepMap(f)
-    def flatMap[B](f: A => B): B = deepMap(f)
-    def map[B](f: A => B): B = deepMap(f)
-  }
 
-  implicit class DeepMonad1[F1[_], A](functor: F1[A])(implicit dfm: DeepMap[Lambda[X => F1[X]], A]) {
+  implicit class DeepMonad[A, B](m: A)(implicit deepNestedType: DeepNestedType[A, B]) {
     def !? = this
     def dm = this
-    def dm1 = this
-    def deepMap[B](f: A => B): F1[B] = dfm(functor)(f)
-    def deepFlatMap[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[B], C]): C = dft(dfm(functor)(f))
-    def flatMap[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[B], C]): C = deepFlatMap(f)
-    def map[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[B], C]): C = deepFlatMap(f)
-  }
-
-  implicit class DeepMonad2[F1[_], F2[_], A](functor: F1[F2[A]])(implicit dfm: DeepMap[Lambda[X => F1[F2[X]]], A]) {
-    def !? = this
-    def dm = this
-    def dm2 = this
-    def deepMap[B](f: A => B): F1[F2[B]] = dfm(functor)(f)
-    def deepFlatMap[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[B]], C]): C = dft(dfm(functor)(f))
-    def flatMap[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[B]], C]): C = deepFlatMap(f)
-    def map[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[B]], C]): C = deepFlatMap(f)
-  }
-
-  implicit class DeepMonad3[F1[_], F2[_], F3[_], A](functor: F1[F2[F3[A]]])(implicit dfm: DeepMap[Lambda[X => F1[F2[F3[X]]]], A]) {
-    def !? = this
-    def dm = this
-    def dm3 = this
-    def deepMap[B](f: A => B): F1[F2[F3[B]]] = dfm(functor)(f)
-    def deepFlatMap[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[F3[B]]], C]): C = dft(dfm(functor)(f))
-    def flatMap[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[F3[B]]], C]): C = deepFlatMap(f)
-    def map[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[F3[B]]], C]): C = deepFlatMap(f)
-  }
-
-  implicit class DeepMonad4[F1[_], F2[_], F3[_], F4[_], A](functor: F1[F2[F3[F4[A]]]])(implicit dfm: DeepMap[Lambda[X => F1[F2[F3[F4[X]]]]], A]) {
-    def !? = this
-    def dm = this
-    def dm4 = this
-    def deepMap[B](f: A => B): F1[F2[F3[F4[B]]]] = dfm(functor)(f)
-    def deepFlatMap[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[F3[F4[B]]]], C]): C = dft(dfm(functor)(f))
-    def flatMap[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[F3[F4[B]]]], C]): C = deepFlatMap(f)
-    def map[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[F3[F4[B]]]], C]): C = deepFlatMap(f)
-  }
-
-  implicit class DeepMonad5[F1[_], F2[_], F3[_], F4[_], F5[_], A](functor: F1[F2[F3[F4[F5[A]]]]])(implicit dfm: DeepMap[Lambda[X => F1[F2[F3[F4[F5[X]]]]]], A]) {
-    def !? = this
-    def dm = this
-    def dm5 = this
-    def deepMap[B](f: A => B): F1[F2[F3[F4[F5[B]]]]] = dfm(functor)(f)
-    def deepFlatMap[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[F3[F4[F5[B]]]]], C]): C = dft(dfm(functor)(f))
-    def flatMap[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[F3[F4[F5[B]]]]], C]): C = deepFlatMap(f)
-    def map[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[F3[F4[F5[B]]]]], C]): C = deepFlatMap(f)
-  }
-
-  implicit class DeepMonad6[F1[_], F2[_], F3[_], F4[_], F5[_], F6[_], A](functor: F1[F2[F3[F4[F5[F6[A]]]]]])(implicit dfm: DeepMap[Lambda[X => F1[F2[F3[F4[F5[F6[X]]]]]]], A]) {
-    def !? = this
-    def dm = this
-    def dm6 = this
-    def deepMap[B](f: A => B): F1[F2[F3[F4[F5[F6[B]]]]]] = dfm(functor)(f)
-    def deepFlatMap[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[F3[F4[F5[F6[B]]]]]], C]): C = dft(dfm(functor)(f))
-    def flatMap[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[F3[F4[F5[F6[B]]]]]], C]): C = deepFlatMap(f)
-    def map[B, C](f: A => B)(implicit dft: DeepFlattenTraverse[F1[F2[F3[F4[F5[F6[B]]]]]], C]): C = deepFlatMap(f)
+    def deepFlatMap[C, D, E](f: B => C)(implicit dm: DeepMap[A, B, C, D], dft: DeepFlattenTraverse[D, E]): E = dft(dm(m)(f))
+    def deepMap[C, D, E](f: B => C)(implicit dm: DeepMap[A, B, C, D], dft: DeepFlattenTraverse[D, E]): E = deepFlatMap(f)
+    def map[C, D, E](f: B => C)(implicit dm: DeepMap[A, B, C, D], dft: DeepFlattenTraverse[D, E]): E = deepFlatMap(f)
+    def flatMap[C, D, E](f: B => C)(implicit dm: DeepMap[A, B, C, D], dft: DeepFlattenTraverse[D, E]): E = deepFlatMap(f)
   }
 
 }

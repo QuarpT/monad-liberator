@@ -50,17 +50,9 @@ This precedence means for the types output, Future will always be outside Lists,
 All types must have a `Cats` Monad implementation, and all types except for the leftmost, must have a `Cats` Traverse implementation on the implicit scope.
 Mixing in the `MonadLiberator` trait provides the default `Cats` implicits.
 
-- Maximum number of monad types in the precedence order is 7 to keep compile times down.
-- Maximum number of nested monad types when deep mapping is 6 to keep compile times down.
-- Maximum number of nested monad types when applying DeepFlattenTraverse is unlimited.
-- Maximum levels of flatMapping in a for comprehension is unlimited.
-
-The library builds type class instances to sequence and flatten nested monads using the precedence rule defined implicitly. 
+The library builds type class instances to 'deep map', 'deep traverse' and 'deep flatten' nested monads using the precedence rule defined implicitly.
 
 It is possible to provide your own precedence, see the [examples](src/main/scala/monad/liberator/examples/Examples.scala).
-
-The library uses type classes, type lambdas and higher kinded types to support 'deep mapping' and 'deep flattening / traversing' on nested monad types
-using an implicit precedence order of monads which can be defined by the user.
 
 The library is experimental and still being developed.
 

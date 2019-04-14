@@ -19,9 +19,6 @@ object BasicExample extends MonadLiberator[String] {
   } yield a * b + c
 
   // Returns Future(List(None, Some(3), None, Some(5)))
-  // Intellij Scala plugin doesn't think this will compile, but it does.
-  // For Intellij friendly code, see ExampleExplicitlyIndicatingMonadDepth
-
   // For Options, if flatMapping on Some or None by themselves, specify the Option type explicitly, e.g. `None: Option[Int]`
 }
 
@@ -29,18 +26,6 @@ object DeepFlattenExample extends MonadLiberator[String] {
   val result: Future[List[Either[Option[Int]]]] =
     DeepFlattenTraverse(Option(Future(Future(Right(Option(Option(List(5))))))))
   // Returns Future(List(Right(Some(5)))
-}
-
-// Intellij prefers specifying the monad depth
-object ExampleExplicitlyIndicatingMonadDepth extends MonadLiberator[String] {
-
-  val result: Future[List[Option[Int]]] = for {
-    a <- List(1, 2).dm1 // dm1 indicates this Monad is 1 Monad types deep (List)
-    b <- List(None, Some(2)).dm2 // dm2 indicates this Monad is 2 Monad types deep (List -> Option)
-    c <- Future(1).dm1
-  } yield a * b + c
-
-  // Returns Future(List(None, Some(3), None, Some(5)))
 }
 
 object DeepMapExample extends MonadLiberator[String] {
@@ -52,10 +37,10 @@ object DeepMapExample extends MonadLiberator[String] {
 object ComplexExample extends MonadLiberator[String] {
 
   val result: Future[List[Either[Option[Int]]]] = for {
-    a <- Option(Future(Right(List(1, 2)))).dm4
-    b <- Option(Option(2)).dm2
-    c <- (a + b).dm0
-    d <- (if (c % 2 == 0) Right(c) else Left[Int](s"$c is not even")).dm1
+    a <- Option(Future(Right(List(1, 2)))).!?
+    b <- Option(Option(2)).!?
+    c <- (a + b).!?
+    d <- (if (c % 2 == 0) Right(c) else Left[Int](s"$c is not even")).!?
   } yield d
 
   // Returns Future(List(Left("3 is not even"), Right(Some(4))))
