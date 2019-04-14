@@ -12,16 +12,33 @@ import scala.util.Try
 
 object BasicExample extends MonadLiberator[String] {
 
-  val result: Future[List[Option[Int]]] = for {
-    a <- List(1, 2).!?
-    b <- List(None, Some(2)).!?
-    c <- Future(1).!?
-  } yield a * b + c
+//  implicitly[PrecedenceGreaterThan[Future[_], List[_]]]
+
+//   implicit val peF = PrecedenceEvidence[EvidenceOf[Future[_]], Precedence[Future[_] :>>: List[_] :>>: Either[_] :>>: Try[_] :>>:  Option[_] :>>: PNil], Precedence[Future[_] :>>: List[_] :>>: Either[_] :>>: Try[_] :>>:  Option[_] :>>: PNil]]
+//   implicit val peL = PrecedenceEvidence[EvidenceOf[List[_]], Precedence[Future[_] :>>: List[_] :>>: Either[_] :>>: Try[_] :>>:  Option[_] :>>: PNil], Precedence[List[Any] :>>: Either[Any] :>>: Try[Any] :>>:  Option[Any] :>>: PNil]]
+//  implicit val xasdf = PrecedenceEvidence.apply2(new EvidenceOf[List[_]], defaultPrecedence)
+//
+//  val xxx = implicitly[PListGreaterThan[Future[_] :>>: List[_] :>>: Either[_] :>>: Try[_] :>>:  Option[_] :>>: PNil, List[_] :>>: Either[_] :>>: Try[_] :>>:  Option[_] :>>: PNil]]
+//
+//  val xsdf: PrecedenceGreaterThan[Future[_], List[_]] = greaterThanEvidenceRule(defaultPrecedence, peF, peL, xxx)
+//
+  val xasdgd = PrecedenceGreaterThan.apply[Future[_], List[_]]()
+
+//  val xsddf: PrecedenceGreaterThan[List[_], Future[_]] = greaterThanEvidenceRule(defaultPrecedence, peL, peF, xxx)
+
+//  val p = PrecedenceEvidence(new EvidenceOf[List[_]], defaultPrecedence)
+//  val ax: Option[Int] = DeepFlattenTraverse(Option(Option(5)))
+//  val x: Future[Option[Int]] = DeepFlattenTraverse(Option(Future(5)))
+//  val result: Future[List[Option[Int]]] = for {
+//    a <- List(1, 2).!?
+//    b <- List(None, Some(2)).!?
+//    c <- Future(1).!?
+//  } yield a * b + c
 
   // Returns Future(List(None, Some(3), None, Some(5)))
   // For Options, if flatMapping on Some or None by themselves, specify the Option type explicitly, e.g. `None: Option[Int]`
 }
-
+/*
 object DeepFlattenExample extends MonadLiberator[String] {
   val result: Future[List[Either[Option[Int]]]] =
     DeepFlattenTraverse(Option(Future(Future(Right(Option(Option(List(5))))))))
@@ -62,7 +79,7 @@ object ExampleChangingPrecedence {
   //    (you would need to provide your own blocking implementation of cats Traverse for Future if you require this).
   type CustomPrecedenceType = Future[_] :>>: Try[_] :>>: Either[String] :>>:  Option[_] :>>: List[_] :>>: PNil
   val monadLiberator = new MonadLiberatorCustomPrecedence[CustomPrecedenceType] {
-    override implicit def overridePrecedence = new Precedence[CustomPrecedenceType] {}
+    override implicit def overridePrecedence = new Precedence[CustomPrecedenceType]
   }
 
   import monadLiberator._
@@ -76,4 +93,4 @@ object ExampleChangingPrecedence {
   // Returns Future(None) since we have overridden the nesting order so that Options come before lists
 }
 
-
+*/

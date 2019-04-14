@@ -12,15 +12,37 @@ sealed trait PNil extends PList {
 
 case object PNil extends PNil
 
-trait Precedence[+A <: PList]
+class Precedence[+A <: PList]
 
-trait PrecedenceGreaterThan[A, B]
+trait PrecedenceEvidence[A, B, C] {
+  type Aux = C
+  def apply(a: A, b: B): C
+}
+
+class EvidenceOf[A]
+
+object PrecedenceEvidence {
+  def apply[A, B, C](implicit pe: PrecedenceEvidence[A, B, C]) = pe
+}
+
+class PrecedenceGreaterThan[A, B]
+
+object PrecedenceGreaterThan {
+  def apply[A,B]()(implicit pgt: PrecedenceGreaterThan[A, B]) = pgt
+}
 
 trait PListGreaterThan[A, B]
 
 trait PrecedenceLowPriorityImplicits {
-  implicit def hListGtEvidence[A, B <: PList, C, D <: PList](implicit ev1: PListGreaterThan[B, D]): PListGreaterThan[A :>>: B, C :>>: D] = {
+  implicit def pListGtEvidence[A, B <: PList, C, D <: PList](implicit ev1: PListGreaterThan[B, D]): PListGreaterThan[A :>>: B, C :>>: D] = {
     new PListGreaterThan[A :>>: B, C :>>: D] {}
+  }
+
+
+  implicit def precedenceEvidenceRule[A, B, C <: PList, D](implicit pe: PrecedenceEvidence[EvidenceOf[A], Precedence[C], D]): PrecedenceEvidence[EvidenceOf[A], Precedence[B :>>: C], D] = new PrecedenceEvidence[EvidenceOf[A], Precedence[B :>>: C], D] {
+    override def apply(a: EvidenceOf[A], b: Precedence[B :>>: C]): D =  {
+      pe(a, new Precedence[C])
+    }
   }
 }
 
@@ -30,11 +52,16 @@ trait PrecedenceImplicits extends PrecedenceLowPriorityImplicits with Precedence
     new PListGreaterThan[A :>>: B, PNil] {}
 
 
-  implicit def greaterThanEvidenceRule[A, B <: PList, C, D <: PList](implicit
-    precedenceEvidence: Precedence[A :>>: B],
-    precedenceEvidence2: Precedence[C :>>: D],
-    pListGreaterThanEvidence: PListGreaterThan[B, D]
+  implicit def greaterThanEvidenceRule[P <: PList, A, B, C, D](implicit
+    precedence: Precedence[P],
+    precedenceEvidence: PrecedenceEvidence[EvidenceOf[A], Precedence[P], B],
+    precedenceEvidence2: PrecedenceEvidence[EvidenceOf[C], Precedence[P], D],
+//    pListGreaterThanEvidence: PListGreaterThan[B, D]
   ): PrecedenceGreaterThan[A, C] = {
-    new PrecedenceGreaterThan[A, C] {}
+    new PrecedenceGreaterThan[A, C]
+  }
+
+  implicit def precedenceEvidenceBase[A, B <: PList] = new PrecedenceEvidence[EvidenceOf[A], Precedence[A :>>: B], Precedence[A :>>: B]] {
+    override def apply(a: EvidenceOf[A], b: Precedence[A :>>: B]): Precedence[A :>>: B] = b
   }
 }

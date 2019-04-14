@@ -14,7 +14,7 @@ package monad.liberator
  *
  */
 
-trait PrecedenceTailImplicits extends PrecedenceTailImplicits2
+trait PrecedenceTailImplicits
 
 trait PrecedenceTailImplicits2 extends PrecedenceTailImplicits3 {
   implicit def precedenceTail_2_1[A1, A2](implicit precedence: Precedence[A1 :>>: A2 :>>: PNil]): Precedence[A2 :>>: PNil] = new Precedence[A2 :>>: PNil] {}
