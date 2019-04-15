@@ -14,7 +14,7 @@ Requires Scala 2.12 or 2.11
 
 ```sbtshell
 resolvers += Resolver.bintrayRepo("quarpt", "maven")
-libraryDependencies += "monad-liberator" %% "monad-liberator" % "0.1.0"
+libraryDependencies += "monad-liberator" %% "monad-liberator" % "0.2.0"
 ```
 
 ## Examples
