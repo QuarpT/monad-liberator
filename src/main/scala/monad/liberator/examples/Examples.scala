@@ -60,9 +60,7 @@ object ExampleChangingPrecedence {
   // It would not be possible to put Future to the right of another type, since it is not Traversable
   //    (you would need to provide your own blocking implementation of cats Traverse for Future if you require this).
   type CustomPrecedenceType = Future[_] :>>: Try[_] :>>: Either[String] :>>:  Option[_] :>>: List[_] :>>: PNil
-  val monadLiberator = new MonadLiberatorCustomPrecedence[CustomPrecedenceType] {
-    override implicit def overridePrecedence = new Precedence[CustomPrecedenceType]
-  }
+  val monadLiberator = new MonadLiberatorCustomPrecedence[CustomPrecedenceType] {}
 
   import monadLiberator._
 

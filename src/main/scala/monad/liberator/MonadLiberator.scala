@@ -21,7 +21,7 @@ trait MonadLiberator[EitherLeftType] extends DeepMonadImplicits
   type Either[R] = scala.Either[EitherLeftType, R]
   def Right[A](value: A): Either[A] = scala.Right(value)
   def Left[SetMeToRightType](value: EitherLeftType): Either[SetMeToRightType] = scala.Left(value)
-  implicit lazy val defaultPrecedence = new Precedence[Future[_] :>>: List[_] :>>: Either[_] :>>: Try[_] :>>:  Option[_] :>>: PNil] {}
+  implicit lazy val defaultPrecedence = new Precedence[Future[_] :>>: List[_] :>>: Either[_] :>>: Try[_] :>>:  Option[_] :>>: PNil]
 }
 
 /**
@@ -35,7 +35,7 @@ trait MonadLiberatorCustomPrecedence[P <: PList] extends DeepMonadImplicits
   with DeepNestedTypeImplicits
   with CatsInstancesImplicits {
 
-  implicit def overridePrecedence: Precedence[P]
+  implicit def overridePrecedence: Precedence[P] = new Precedence[P]
 }
 
 trait CatsInstancesImplicits extends instances.AllInstances
