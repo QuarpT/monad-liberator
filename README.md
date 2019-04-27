@@ -22,10 +22,13 @@ libraryDependencies += "monad-liberator" %% "monad-liberator" % "0.2.0"
 ### For comprehension example
 
 ```scala
+val monadLiberator = new MonadLiberator[String] // String type parameter is your Either Left type
+import monadLiberator._
+
 val result: Future[List[Option[Int]]] = for {
-  a <- List(1, 2).!?
-  b <- List(None, Some(2)).!?
-  c <- Future(1).!?
+  a <- List(1, 2).M
+  b <- List(None, Some(2)).M
+  c <- Future(1).M
 } yield a * b + c
 
 // Returns Future(List(None, Some(3), None, Some(5)))
@@ -34,7 +37,10 @@ val result: Future[List[Option[Int]]] = for {
 ### Deep Flatten Traverse example
 
 ```scala
-val result = DeepFlattenTraverse(Option(Future(Future(Right(Option(Option(List(5))))))))
+val monadLiberator = new MonadLiberator[String]
+import monadLiberator._
+
+val result = DeepFlattenTraverse(Some(Future(Future(Right(Some(Some(List(5))))))))
 // Returns Future(List(Right(Some(5)))
 ```
 
@@ -44,9 +50,9 @@ See [examples](src/main/scala/monad/liberator/examples/Examples.scala) for more 
 
 The default implicit precedence is 
 ```
-Future[_] > List[_] > Either[_] > Try[_] > Option[_]
+Future[_] > Seq[_] > Either[_] > Try[_] > Option[_]
 ```
-This precedence means for the types output, Future will always be outside Lists, which will be outside Eithers etc...
+This precedence means for the types output, Future will always be outside Sequences, which will be outside Eithers etc...
 All types must have a `Cats` Monad implementation, and all types except for the leftmost, must have a `Cats` Traverse implementation on the implicit scope.
 Mixing in the `MonadLiberator` trait provides the default `Cats` implicits.
 

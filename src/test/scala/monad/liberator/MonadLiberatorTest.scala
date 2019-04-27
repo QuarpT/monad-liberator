@@ -4,7 +4,7 @@ import monad.liberator.examples._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FlatSpec, Matchers}
 
-class MonadLiberatorTest extends FlatSpec with  MonadLiberator[String] with ScalaFutures with Matchers {
+class MonadLiberatorTest extends FlatSpec with ScalaFutures with Matchers {
 
   "The examples" should "return the expected results" in {
     whenReady(BasicExample.result)(_ shouldBe List(None, Some(3), None, Some(5)))
