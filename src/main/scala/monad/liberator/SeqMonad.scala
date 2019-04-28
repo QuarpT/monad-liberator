@@ -4,6 +4,7 @@ import cats._
 
 import scala.annotation.tailrec
 
+// Taken from cats source
 trait SeqMonad {
   implicit val seqMonad = new Monad[Seq] with Traverse[Seq] {
     override def pure[A](x: A): Seq[A] = Vector(x)

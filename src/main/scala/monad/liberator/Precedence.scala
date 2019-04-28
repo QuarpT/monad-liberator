@@ -53,7 +53,7 @@ trait PrecedenceImplicits extends PrecedenceLowPriorityImplicits {
     new PrecedenceGreaterThan[A, C]
   }
 
-  implicit def precedenceEvidenceBase[A, B <: PList] = new PrecedenceEvidence[EvidenceOf[A], Precedence[A :>>: B], Precedence[A :>>: B]] {
-    override def apply(a: EvidenceOf[A], b: Precedence[A :>>: B]): Precedence[A :>>: B] = b
+  implicit def precedenceEvidenceBase[A, B <: PList] = new PrecedenceEvidence[EvidenceOf[A], Precedence[A :>>: B], Precedence[B]] {
+    override def apply(a: EvidenceOf[A], b: Precedence[A :>>: B]): Precedence[B] = new Precedence[B]
   }
 }
