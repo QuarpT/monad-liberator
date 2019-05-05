@@ -20,7 +20,7 @@ trait CorrectPrecedenceImplicits extends CorrectPrecedenceLowPriorityImplicits {
     precedence: Precedence[P],
     precedenceEvidence: PrecedenceEvidence[EvidenceOf[F[_]], Precedence[P], Q],
     inner: DeepNestedType[F[A], B],
-    correctPrecedence: CorrectPrecedenceHelper[A, Q, B],
+    correctPrecedence: CorrectPrecedenceHelper[A, Q, B]
   ) = new CorrectPrecedence[F[A], Precedence[P]] {}
 
   implicit def correctPrecedenceHelperRule[F[_], A, PHead, P <: PList, Q, B](implicit
