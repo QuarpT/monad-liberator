@@ -64,7 +64,7 @@ object ComplexExample {
 
 object ExampleChangingPrecedence {
 
-  // Copy and paste MonadLiberator and add your own MonadTypeWitnesses and implicit precedence object
+  // Copy and paste MonadLiberator class and add your own MonadTypeWitnesses and implicit precedence object
   // MonadTypeWitnesses are used to find Monad types from subclasses for implicits.
   // It would be possible to convert Monad types using a MonadTypeWitness, e.g. convert Try monads to Future monads.
   class CustomMonadLiberator[EitherLeftType] extends MonadLiberatorMixin {
