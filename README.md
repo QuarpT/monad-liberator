@@ -1,12 +1,13 @@
 # Monad Liberator
 
-Liberate your monads
+This was written to experiment and play with some type level programming in Scala. Not for use in prod.
 
 ## Overview
 
-Monad Liberator is a library for mixing multiple monad and nested monads types in Scala `for` comprehensions using customisable implicit rules of precedence.
+Monad Liberator is a library for mixing multiple monad and nested monads types in Scala `for` comprehensions.
+Nested monad types are reordered and flattened automatically based on customisable implicit ordering rules.
 
-The library also supports deep flattening / deep traversing / deep mapping nested monads
+It could be seen as an alternative to monad transformers.
 
 ## Install
 
@@ -14,10 +15,10 @@ Requires Scala 2.12 or 2.11
 
 ```sbtshell
 resolvers += Resolver.bintrayRepo("quarpt", "maven")
-libraryDependencies += "monad-liberator" %% "monad-liberator" % "0.2.0"
+libraryDependencies += "monad-liberator" %% "monad-liberator" % "1.0.0"
 ```
 
-## Examples
+## Basic Examples
 
 ### For comprehension example
 
@@ -48,26 +49,3 @@ val result = DeepFlattenTraverse(Some(Future(Future(Right(Some(Some(List(5))))))
 // Returns Future(List(Right(Some(5)))
 ```
 
-See [examples](src/main/scala/monad/liberator/examples/Examples.scala) for more detailed information and context.
-
-## Implementation details
-
-The default implicit precedence is 
-```
-Future[_] > Seq[_] > EitherM[_] > Try[_] > Option[_]
-```
-This precedence means for the types output, Future will always be outside Sequences, which will be outside Eithers etc...
-All types must have a `Cats` Monad implementation, and all types except for the leftmost, must have a `Cats` Traverse implementation on the implicit scope.
-Mixing in the `MonadLiberator` trait provides the default `Cats` implicits.
-
-The library builds type class instances to 'deep map', 'deep traverse' and 'deep flatten' nested monads using the precedence rule defined implicitly.
-
-It is possible to provide your own precedence, see the [examples](src/main/scala/monad/liberator/examples/Examples.scala).
-
-The library is experimental and still being developed.
-
-## Contributors
-
-- Peter Colley (zvvvvt@gmail.com)
-
-Comments and contributions are welcome. 
